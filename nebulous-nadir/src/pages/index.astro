@@ -1,0 +1,127 @@
+---
+// src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
+import "../styles/global.css";
+import { getCollection } from 'astro:content';
+import { normalizeDate } from '../utils/date.js';
+
+// 从 content 集合获取文章
+const posts = await getCollection('posts');
+// 按日期降序排序，取最新的5篇 - 使用安全的日期处理
+const recentPosts = posts
+  .sort((a, b) => {
+    const dateA = normalizeDate(a.data.date).getTime();
+    const dateB = normalizeDate(b.data.date).getTime();
+    return dateB - dateA;
+  })
+  .slice(0, 5);
+---
+
+<Layout pageTitle="首页">
+  <!-- 简洁的头部 -->
+  <div class="mb-16 pt-8">
+    <h1 class="text-4xl font-bold text-neutral-900 mb-4">
+      Hello
+    </h1>
+    <div class="h-1 w-16 bg-gradient-to-r from-red-500 to-orange-400 mb-6"></div>
+    <p class="text-lg text-neutral-600 max-w-xl">
+      写写文字，记录生活。
+    </p>
+  </div>
+
+  <!-- 最近文章 -->
+  <section class="mb-20">
+    <div class="flex items-center mb-8">
+      <h2 class="text-xl font-medium text-neutral-900">最近文章</h2>
+      <div class="ml-4 h-px flex-1 bg-neutral-200"></div>
+      <span class="text-sm text-neutral-500 ml-4">
+        {posts.length} 篇
+      </span>
+    </div>
+
+    <div class="space-y-6">
+      {recentPosts.map((post) => {
+        const postDate = normalizeDate(post.data.date);
+        const formattedDate = postDate.toLocaleDateString('zh-CN', {
+          month: 'short',
+          day: 'numeric'
+        });
+        const formattedYear = postDate.getFullYear().toString();
+        
+        return (
+          <article class="group">
+            <a 
+              href={`/posts/${post.slug}`}
+              class="block hover:bg-neutral-50 rounded-lg transition-colors -mx-4 px-4 py-3"
+            >
+              <div class="flex items-start">
+                <div class="w-20 flex-shrink-0">
+                  <div class="text-sm text-neutral-500">
+                    {formattedDate}
+                  </div>
+                  <div class="text-xs text-neutral-400 mt-0.5">
+                    {formattedYear}
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-lg font-medium text-neutral-900 group-hover:text-red-600 transition-colors mb-1">
+                    {post.data.title}
+                  </h3>
+                  {post.data.description && (
+                    <p class="text-sm text-neutral-600 line-clamp-2">
+                      {post.data.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </a>
+          </article>
+        );
+      })}
+    </div>
+
+    {posts.length > 5 && (
+      <div class="mt-10 pt-8 border-t border-neutral-200">
+        <a 
+          href="/posts"
+          class="text-sm text-neutral-600 hover:text-red-600 transition-colors inline-flex items-center"
+        >
+          查看所有文章 →
+        </a>
+      </div>
+    )}
+  </section>
+
+  <!-- 状态更新 -->
+  <section class="mb-20">
+    <h2 class="text-xl font-medium text-neutral-900 mb-6">最近动态</h2>
+    <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-6 border border-red-100">
+      <div class="flex items-start">
+        <div class="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+        <div>
+          <p class="text-neutral-700">
+            正在学习 Astro 和 Tailwind，重构这个博客。
+          </p>
+          <p class="text-sm text-neutral-500 mt-2">
+            更新于 {new Date().toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

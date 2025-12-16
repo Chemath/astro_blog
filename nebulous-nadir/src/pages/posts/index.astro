@@ -1,0 +1,145 @@
+---
+// src/pages/posts/index.astro
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { normalizeDate } from '../../utils/date.js';
+
+// 获取所有文章
+const posts = await getCollection('posts');
+
+// 按日期降序排序 - 使用安全的日期处理
+const sortedPosts = posts.sort((a, b) => {
+  const dateA = normalizeDate(a.data.date).getTime();
+  const dateB = normalizeDate(b.data.date).getTime();
+  return dateB - dateA;
+});
+
+// 按年份分组
+const postsByYear = sortedPosts.reduce((acc, post) => {
+  const year = normalizeDate(post.data.date).getFullYear();
+  if (!acc[year]) {
+    acc[year] = [];
+  }
+  acc[year].push(post);
+  return acc;
+}, {});
+
+const years = Object.keys(postsByYear).sort((a, b) => b - a);
+---
+
+<Layout pageTitle="文章">
+  <!-- 和首页完全一致的头部 -->
+<div class="mb-16 pt-8">
+  <h1 class="text-4xl font-bold text-neutral-900 mb-4">
+    Posts
+  </h1>
+  <div class="h-1 w-16 bg-gradient-to-r from-red-500 to-orange-400 mb-6"></div>
+  <p class="text-lg text-neutral-600 max-w-xl">
+    所有文章 · {posts.length} 篇
+  </p>
+</div>
+
+  <!-- 按年份分组的文章列表 -->
+  <div class="space-y-12">
+    {years.map((year) => (
+      <section>
+        <div class="flex items-center mb-6">
+          <h2 class="text-2xl font-bold text-neutral-900">{year} 年</h2>
+          <div class="ml-4 flex-1 h-px bg-gradient-to-r from-neutral-200 to-transparent"></div>
+          <span class="text-sm text-neutral-500 ml-4">
+            {postsByYear[year].length} 篇
+          </span>
+        </div>
+
+        <div class="space-y-4">
+          {postsByYear[year].map((post) => {
+            const formattedDate = normalizeDate(post.data.date).toLocaleDateString('zh-CN', {
+              month: 'short',
+              day: 'numeric'
+            });
+            
+            return (
+              <article class="group">
+                <a 
+                  href={`/posts/${post.slug}`}
+                  class="flex items-start md:items-center p-4 rounded-lg hover:bg-neutral-50 transition-colors duration-200 border border-transparent hover:border-neutral-200"
+                >
+                  <time class="text-sm text-neutral-500 w-24 flex-shrink-0 mt-1 md:mt-0">
+                    {formattedDate}
+                  </time>
+                  
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-medium text-neutral-900 group-hover:text-red-600 transition-colors truncate">
+                      {post.data.title}
+                    </h3>
+                    
+                    {post.data.description && (
+                      <p class="text-sm text-neutral-600 mt-1 line-clamp-1 md:line-clamp-2">
+                        {post.data.description}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div class="hidden md:flex items-center space-x-4 ml-6 flex-shrink-0">
+                    <span class="text-neutral-400 group-hover:text-red-500 transition-colors">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </span>
+                  </div>
+                </a>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <!-- 统计信息 -->
+  <div class="mt-16 pt-8 border-t border-neutral-200">
+    <div class="text-center">
+      <div class="inline-flex items-center space-x-6 text-sm text-neutral-500">
+        <span>
+          <span class="text-xl font-bold text-neutral-900">{posts.length}</span> 篇文章
+        </span>
+        <span>•</span>
+        <span>
+          <span class="text-xl font-bold text-neutral-900">
+            {years.length}
+          </span> 个年份
+        </span>
+        <span>•</span>
+        <span>
+          最后更新于 {sortedPosts[0] && normalizeDate(sortedPosts[0].data.date).toLocaleDateString('zh-CN', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })}
+        </span>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+</style>

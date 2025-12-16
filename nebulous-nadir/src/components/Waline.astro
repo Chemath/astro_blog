@@ -1,0 +1,88 @@
+---
+// src/components/Waline.astro - 修复版
+interface Props {
+  path: string;
+}
+
+const { path } = Astro.props;
+const serverURL = import.meta.env.PUBLIC_WALINE_SERVER_URL;
+const isConfigured = !!serverURL;
+---
+
+<meta charset="UTF-8" />
+
+{isConfigured ? (
+  <>
+    <!-- Waline 容器 -->
+    <div id="waline-container" class="waline-wrapper">
+      <div id="waline"></div>
+    </div>
+    
+    <!-- Waline CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@waline/client@2/dist/waline.css"
+    />
+    
+    <!-- Waline JS -->
+    <script type="module" is:inline>
+  import { init } from 'https://unpkg.com/@waline/client@2/dist/waline.mjs';
+
+  init({
+    el: '#waline',
+    serverURL: '{serverURL}',
+    path: '{path}',
+    lang: 'zh-CN',
+
+    comment: true,
+    pageview: true,
+
+    login: 'false',
+    meta: ['nick', 'mail', 'link'],
+    requiredMeta: ['nick'],
+
+    locale: {
+      placeholder: '欢迎留下你的评论…',
+      nick: '昵称',
+      mail: '邮箱',
+      link: '网址',
+    },
+
+    dark: document.documentElement.classList.contains('dark'),
+  });
+</script>
+
+  </>
+) : (
+  <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
+    <p class="text-yellow-800">⚠️ 评论功能未配置</p>
+    <p class="text-sm text-yellow-600 mt-1">
+      请在 .env 文件中设置 PUBLIC_WALINE_SERVER_URL
+    </p>
+  </div>
+)}
+
+<style>
+  .waline-wrapper {
+    margin-top: 1rem;
+  }
+  
+  #waline {
+    --waline-theme-color: #dc2626;
+    --waline-active-color: #b91c1c;
+    --waline-bgcolor: #fafafa;
+    --waline-bgcolor-light: #ffffff;
+    --waline-border-color: #e5e7eb;
+    --waline-border-radius: 12px;
+    --waline-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+  
+  :global(.dark) #waline {
+    --waline-theme-color: #f87171;
+    --waline-active-color: #ef4444;
+    --waline-bgcolor: #1f2937;
+    --waline-bgcolor-light: #374151;
+    --waline-border-color: #4b5563;
+    --waline-text-color: #e5e7eb;
+  }
+</style>

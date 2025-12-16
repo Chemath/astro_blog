@@ -1,0 +1,66 @@
+---
+// src/components/TableOfContents.astro
+
+interface Props {
+  headings: Array<{
+    depth: number;
+    text: string;
+    slug: string;
+  }>;
+}
+
+const { headings = [] } = Astro.props;
+
+// 只显示 h2 和 h3 标题
+const filteredHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
+---
+
+<nav class="not-prose" aria-label="文章目录">
+  <div class="sticky top-24">
+    <div class="mb-4 pb-3 border-b border-neutral-200">
+      <div class="flex items-center space-x-2">
+        <svg class="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <h3 class="text-sm font-semibold text-neutral-900">目录</h3>
+      </div>
+    </div>
+
+    {filteredHeadings.length > 0 ? (
+      <ul class="space-y-2 text-sm">
+        {filteredHeadings.map((heading) => (
+          <li 
+            class={`${heading.depth === 3 ? 'ml-4' : ''}`}
+            style={{
+              paddingLeft: heading.depth === 3 ? '1rem' : '0'
+            }}
+          >
+            <a 
+              href={`#${heading.slug}`}
+              class="group flex items-center py-1.5 text-neutral-600 hover:text-red-600 transition-colors"
+            >
+              <div class="w-1.5 h-1.5 rounded-full bg-neutral-300 group-hover:bg-red-400 transition-colors mr-2 flex-shrink-0"></div>
+              <span class="truncate">{heading.text}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="text-sm text-neutral-500 italic">本文暂无标题</p>
+    )}
+
+    <!-- 目录底部提示 -->
+    <div class="mt-6 pt-4 border-t border-neutral-200">
+      <div class="text-xs text-neutral-500">
+        <div class="flex items-center space-x-1 mb-1">
+          <div class="w-2 h-2 rounded-full bg-neutral-400"></div>
+          <span>主要章节</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 rounded-full bg-neutral-300 ml-4"></div>
+          <span>子章节</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

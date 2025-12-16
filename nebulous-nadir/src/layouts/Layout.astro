@@ -1,0 +1,244 @@
+---
+// src/layouts/Layout.astro
+
+interface Props {
+  pageTitle?: string;
+  hideSidebar?: boolean;
+}
+
+const config = {
+  name: 'Chemath',
+  avatar: 'https://img.chemath.com/avatar.jpg',
+  currentYear: new Date().getFullYear(),
+  showCopyright: true
+};
+
+const { pageTitle, hideSidebar = false } = Astro.props;
+const title = pageTitle ? `${pageTitle} | ${config.name}` : config.name;
+const isActive = (path: string) => Astro.url.pathname === path;
+import "../styles/global.css";
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+</head>
+<body class="bg-white text-neutral-900 font-sans antialiased min-h-screen">
+  {!hideSidebar ? (
+    <!-- 完整布局：侧边栏 + 主内容 -->
+    <div class="flex flex-col lg:flex-row min-h-screen">
+      <!-- 移动端顶部导航 -->
+      <header class="lg:hidden sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/95 backdrop-blur-sm">
+        <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            {config.avatar ? (
+              <img 
+                src={config.avatar} 
+                alt={config.name}
+                class="w-8 h-8 rounded-full object-cover"
+                width="32"
+                height="32"
+              />
+            ) : (
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-red-50 to-indigo-100 flex items-center justify-center">
+                <span class="text-sm font-bold text-red-500">
+                  {config.name.charAt(0)}
+                </span>
+              </div>
+            )}
+            <h1 class="text-lg font-bold text-neutral-900">{config.name}</h1>
+          </div>
+          
+          <!-- 移动端菜单按钮 -->
+          <button id="mobile-menu-btn" class="p-2 text-neutral-600 hover:text-red-600 lg:hidden" aria-label="菜单">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- 移动端导航菜单 -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-neutral-100">
+          <nav class="container mx-auto px-4 py-3">
+            <ul class="space-y-1">
+              <li>
+                <a 
+                  href="/" 
+                  class={`flex items-center px-4 py-3 rounded-lg transition-colors duration-200 ${isActive('/') ? 'bg-red-50 text-red-600 font-semibold' : 'hover:bg-neutral-50 text-neutral-700'}`}
+                >
+                  <span>首页</span>
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="/posts" 
+                  class={`flex items-center px-4 py-3 rounded-lg transition-colors duration-200 ${isActive('/posts') ? 'bg-red-50 text-red-600 font-semibold' : 'hover:bg-neutral-50 text-neutral-700'}`}
+                >
+                  <span>文章</span>
+                </a>
+              </li>
+
+              <li>
+                <a 
+                  href="/about" 
+                  class={`flex items-center px-4 py-3 rounded-lg transition-colors duration-200 ${isActive('/about') ? 'bg-red-50 text-red-600 font-semibold' : 'hover:bg-neutral-50 text-neutral-700'}`}
+                >
+                  <span>关于我</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      <!-- 侧边栏 -->
+      <aside class="hidden lg:flex lg:w-64 xl:w-72 fixed left-0 top-0 h-screen border-r border-neutral-100 bg-white p-8 flex-col justify-start items-start pt-32 z-40">
+        
+        <!-- 头像部分 -->
+        <div class="mb-12 flex flex-col items-center w-full">
+          <div class="relative mb-5 group">
+            <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-xl ring-2 ring-neutral-100 group-hover:ring-red-200 transition-all duration-300">
+              {config.avatar ? (
+                <img 
+                  src={config.avatar} 
+                  alt={config.name}
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  width="112"
+                  height="112"
+                  loading="eager"
+                />
+              ) : (
+                <div class="w-full h-full bg-gradient-to-br from-red-50 to-indigo-100 flex items-center justify-center">
+                  <span class="text-3xl font-bold text-red-500">
+                    {config.name.charAt(0)}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <h1 class="text-xl font-bold text-neutral-900 mt-3">{config.name}</h1>
+          <div class="flex items-center mt-2 space-x-2">
+            <div class="relative">
+              <div class="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
+              <div class="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-75"></div>
+            </div>
+            <span class="text-sm text-green-600 font-medium">在线</span>
+          </div>
+        </div>
+
+        <!-- 导航菜单 -->
+        <nav class="w-full flex-1">
+          <ul class="space-y-1">
+            <li>
+              <a 
+                href="/" 
+                class={`flex items-center p-3 rounded-xl transition-all duration-200 ${isActive('/') ? 'bg-red-50 text-red-600 font-semibold shadow-sm' : 'hover:bg-neutral-50 text-neutral-700 hover:text-red-600'}`}
+              >
+                <span class="ml-2">首页</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/posts" 
+                class={`flex items-center p-3 rounded-xl transition-all duration-200 ${isActive('/posts') ? 'bg-red-50 text-red-600 font-semibold shadow-sm' : 'hover:bg-neutral-50 text-neutral-700 hover:text-red-600'}`}
+              >
+                <span class="ml-2">文章</span>
+              </a>
+            </li>
+            
+            <li>
+              <a 
+                href="/about" 
+                class={`flex items-center p-3 rounded-xl transition-all duration-200 ${isActive('/about') ? 'bg-red-50 text-red-600 font-semibold shadow-sm' : 'hover:bg-neutral-50 text-neutral-700 hover:text-red-600'}`}
+              >
+                <span class="ml-2">关于我</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- 版权信息 -->
+{config.showCopyright && (
+  <div class="mt-auto pt-8 w-full">
+    <div class="text-center text-xs text-neutral-400 border-t border-neutral-100 pt-6">
+      <p>
+        © 
+        {new Date().getFullYear() === 2024 ? 
+          '2024' : 
+          `2024-${new Date().getFullYear()}`
+        } 
+        {config.name}
+      </p>
+      <p class="mt-1 text-[10px] tracking-wide">由 Astro 强力驱动</p>
+    </div>
+  </div>
+)}
+      </aside>
+
+      <!-- 主内容区 -->
+      <main class={`flex-1 ${hideSidebar ? '' : 'lg:ml-64 xl:ml-72'} min-h-screen`}>
+        <div class="p-6 md:p-10 lg:p-12 max-w-4xl xl:max-w-6xl mx-auto w-full">
+          
+          
+          <!-- 页面内容 -->
+          <div class="prose prose-neutral max-w-none">
+            <slot />
+          </div>
+        </div>
+      </main>
+    </div>
+  ) : (
+    <!-- 无侧边栏布局 -->
+    <div class="min-h-screen">
+      <main class="max-w-6xl mx-auto px-6 md:px-10 lg:px-12 py-10">
+        {pageTitle && (
+          <header class="mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">{pageTitle}</h1>
+            <div class="w-16 h-1 bg-gradient-to-r from-red-500 to-orange-400 rounded-full"></div>
+          </header>
+        )}
+        <div class="prose prose-neutral max-w-none">
+          <slot />
+        </div>
+      </main>
+    </div>
+  )}
+
+  <!-- 移动端菜单交互脚本 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener('click', () => {
+          mobileMenu.classList.toggle('hidden');
+          menuBtn.innerHTML = mobileMenu.classList.contains('hidden') 
+            ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+               </svg>`
+            : `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+               </svg>`;
+        });
+        
+        // 点击菜单项自动关闭菜单
+        mobileMenu.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            menuBtn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                 </svg>`;
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>
