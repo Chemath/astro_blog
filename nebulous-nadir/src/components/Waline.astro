@@ -1,64 +1,97 @@
 ---
-// src/components/Waline.astro - 修复版
-interface Props {
-  path: string;
-}
-
-const { path } = Astro.props;
+// src/components/Waline.astro
 const serverURL = import.meta.env.PUBLIC_WALINE_SERVER_URL;
+const currentPath = Astro.url.pathname;
 const isConfigured = !!serverURL;
----
 
-<meta charset="UTF-8" />
+// 更好的环境变量检查
+const isDevelopment = import.meta.env.DEV;
+---
 
 {isConfigured ? (
   <>
-    <!-- Waline 容器 -->
     <div id="waline-container" class="waline-wrapper">
       <div id="waline"></div>
     </div>
-    
-    <!-- Waline CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/@waline/client@2/dist/waline.css"
-    />
-    
-    <!-- Waline JS -->
-    <script type="module" is:inline>
-  import { init } from 'https://unpkg.com/@waline/client@2/dist/waline.mjs';
 
-  init({
-    el: '#waline',
-    serverURL: '{serverURL}',
-    path: '{path}',
-    lang: 'zh-CN',
+    <!-- Waline 样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/@waline/client@2/dist/waline.css" />
 
-    comment: true,
-    pageview: true,
+    <!-- Waline 初始化 -->
+    <script
+      type="module"
+      is:inline
+      define:vars={{ serverURL, currentPath, isDevelopment }}
+    >
+      // 开发模式下的调试信息
+      if (isDevelopment) {
+        console.log('🎯 Waline 服务器地址:', serverURL);
+        console.log('📄 当前路径:', currentPath);
+      }
 
-    login: 'false',
-    meta: ['nick', 'mail', 'link'],
-    requiredMeta: ['nick'],
+      // 动态加载 Waline
+      import('https://unpkg.com/@waline/client@2/dist/waline.mjs')
+        .then(({ init }) => {
+          init({
+            el: '#waline',
+            serverURL,
+            path: currentPath,
+            lang: 'zh-CN',
+            login: 'enable',   // 可改为 'enable'
+            dark: document.documentElement.classList.contains('dark'),
 
-    locale: {
-      placeholder: '欢迎留下你的评论…',
-      nick: '昵称',
-      mail: '邮箱',
-      link: '网址',
-    },
-
-    dark: document.documentElement.classList.contains('dark'),
-  });
-</script>
-
+            // 可选配置
+            comment: true,
+            pageview: true,
+            meta: ['nick', 'mail', 'link'],
+            requiredMeta: ['nick'],
+            locale: {
+              placeholder: '欢迎留言讨论...',
+              nick: '昵称',
+              mail: '邮箱',
+              link: '网址',
+            },
+            emoji: [
+              '//unpkg.com/@waline/emojis@1/weibo',
+              '//unpkg.com/@waline/emojis@1/qq',
+            ],
+            reaction: true, // 新增：启用表情反应
+            search: false,  // 评论搜索功能
+            
+            // 错误处理
+            errorHandler: (error) => {
+              console.error('💥 Waline 错误:', error);
+            },
+            
+            // 成功回调（可选）
+            successHandler: () => {
+              if (isDevelopment) {
+                console.log('✅ Waline 加载成功');
+              }
+            }
+          });
+        })
+        .catch(err => {
+          console.error('❌ Waline 加载失败:', err);
+        });
+    </script>
   </>
 ) : (
-  <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
-    <p class="text-yellow-800">⚠️ 评论功能未配置</p>
-    <p class="text-sm text-yellow-600 mt-1">
-      请在 .env 文件中设置 PUBLIC_WALINE_SERVER_URL
+  <div class="p-6 bg-yellow-50 border border-yellow-200 rounded-xl">
+    <h3 class="text-lg font-medium text-yellow-800">Waline 未配置</h3>
+    <p class="mt-2 text-yellow-700">
+      请在 <code>.env</code> 中设置
+      <code class="mx-1 px-2 py-1 bg-yellow-100 rounded">
+        PUBLIC_WALINE_SERVER_URL
+      </code>
     </p>
+    {isDevelopment && (
+      <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+        <p class="text-blue-700 text-sm">
+          💡 提示：在开发模式下，你可以在 <code>.env.local</code> 中临时设置环境变量
+        </p>
+      </div>
+    )}
   </div>
 )}
 
