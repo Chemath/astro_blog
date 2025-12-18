@@ -25,13 +25,7 @@ import "../styles/global.css";
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title}</title>
-  <!-- favicon -->
-  <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
 
 </head>
 <body class="bg-white text-neutral-900 font-sans antialiased min-h-screen">
@@ -95,6 +89,16 @@ import "../styles/global.css";
                   class={`flex items-center px-4 py-3 rounded-lg transition-colors duration-200 ${isActive('/about') ? 'bg-red-50 text-red-600 font-semibold' : 'hover:bg-neutral-50 text-neutral-700'}`}
                 >
                   <span>关于我</span>
+                </a>
+              </li>
+
+              <li>
+                <a 
+                  href="/rss.xml" 
+                  target="_blank"
+                  class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200 hover:bg-neutral-50 text-neutral-700"
+                >
+                  <span>RSS</span>
                 </a>
               </li>
             </ul>
@@ -166,25 +170,44 @@ import "../styles/global.css";
                 <span class="ml-2">关于我</span>
               </a>
             </li>
+
+            <li>
+              <a 
+                href="/rss.xml" 
+                target="_blank"
+                class="flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-neutral-50 text-neutral-700 hover:text-orange-600"
+                >
+                  <span class="ml-2">RSS</span>
+                </a>
+            </li>
           </ul>
         </nav>
 
         <!-- 版权信息 -->
-{config.showCopyright && (
-  <div class="mt-auto pt-8 w-full">
-    <div class="text-center text-xs text-neutral-400 border-t border-neutral-100 pt-6">
-      <p>
-        © 
-        {new Date().getFullYear() === 2024 ? 
-          '2024' : 
-          `2024-${new Date().getFullYear()}`
-        } 
-        {config.name}
-      </p>
-      <p class="mt-1 text-[10px] tracking-wide">由 Astro 强力驱动</p>
-    </div>
-  </div>
-)}
+        {config.showCopyright && (
+          <div class="mt-auto pt-8 w-full">
+            <div class="text-center text-xs text-neutral-400 border-t border-neutral-100 pt-6">
+              <p>
+            © 
+            {new Date().getFullYear() === 2024 ? 
+              '2024' : 
+              `2024-${new Date().getFullYear()}`
+            } 
+            {config.name}
+          </p>
+          <p class="mt-1 text-[10px] tracking-wide">由 Astro 强力驱动</p>
+          <p class="mt-2">
+            <a 
+              href="/sitemap-index.xml" 
+              target="_blank"
+              class="text-neutral-400 hover:text-red-500 transition-colors duration-200"
+            >
+                Sitemap
+              </a>
+            </p>
+          </div>
+        </div>
+      )}
       </aside>
 
       <!-- 主内容区 -->
