@@ -1,5 +1,5 @@
 ---
-title: "为何选择 Astro 搭建静态博客"
+title: "为何选择Astro搭建静态博客"
 date: 2025-12-18
 description: "从 Next.js 升级问题转向 Astro，实现低维护、高安全的静态博客，介绍技术栈与防护策略。"
 ---
