@@ -5,8 +5,8 @@ export async function GET(context) {
   const posts = await getCollection('posts');
 
   return rss({
-    title: 'Chemath',
-    description: '写写文字，记录生活。',
+    title: 'Astro Blog',
+    description: 'A public Astro blog template.',
     site: context.site,
     items: posts
       .sort((a, b) => new Date(b.data.date) - new Date(a.data.date))

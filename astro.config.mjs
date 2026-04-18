@@ -3,10 +3,9 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://chemath.com', // 替换为你自己的域名
+  site: 'https://example.com',
   vite: {
     plugins: [tailwindcss()]
   },
   integrations: [sitemap()]
 });
-
